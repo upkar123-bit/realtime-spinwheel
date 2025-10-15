@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  balance   Int      @default(0) // cents
+  createdAt DateTime @default(now())
+  joins     Join[]
+}
+
+model Wheel {
+  id            String   @id @default(uuid())
+  hostId        String
+  title         String
+  segments      Json     // [{label: "50", weight: 1}, ...]
+  entryFee      Int      // cents
+  maxPlayers    Int?
+  status        String   @default("waiting") // waiting, running, finished
+  serverSeed    String?  // revealed after finish
+  serverSeedHash String? // H(secret) revealed beforehand
+  createdAt     DateTime @default(now())
+  startsAt      DateTime?
+  joins         Join[]
+}
+
+model Join {
+  id        String   @id @default(uuid())
+  userId    String
+  wheelId   String
+  paid      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  payout    Int?     // cents winner payout
+}
